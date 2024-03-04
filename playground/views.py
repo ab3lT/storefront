@@ -6,5 +6,7 @@ from django.http import HttpResponse
 # action
 
 def hello(request):
+    x = 1
+    y = 2
     # return HttpResponse("Hello world")
     return render(request, 'hello.html', {'name': 'abel'})
