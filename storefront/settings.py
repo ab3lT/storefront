@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',# displaying one time notification 
     'django.contrib.staticfiles', # for static files image , css , html
     'playground',
-    'debug_toolbar'
+    'debug_toolbar',
+    'store',
+    'tags'
 ]
 
 MIDDLEWARE = [
