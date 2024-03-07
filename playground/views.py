@@ -16,9 +16,11 @@ def hello(request):
     #  query_set = Product.objects.order_by('unit_price','-title').reverse() 
     # query_set = Product.objects.filter(collection__id=1).order_by('unit_price').reverse() 
     # product = Product.objects.order_by('unit_price')[0] 
-    product = Product.objects.earliest('unit_price')
+    # product = Product.objects.earliest('unit_price')
     
+    #limiting results
+    query_set = Product.objects.all()[:5]
     
     # for product in query_set:
     #     print(product)
-    return render(request, 'hello.html', {'name': 'abel', 'product': product})
+    return render(request, 'hello.html', {'name': 'abel', 'product': list(query_set)})
