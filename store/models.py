@@ -67,6 +67,11 @@ class Customer(models.Model):
         indexes = [
             models.Index(fields = ['first_name', 'last_name'])
         ]
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+    
+    class Meta:
+        ordering = ['first_name', 'last_name']
     
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete = models.PROTECT)
