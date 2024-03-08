@@ -24,6 +24,13 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now = True)
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     promotions  = models.ManyToManyField(Promotion)
+    
+    def __str__(self):
+        return self.title
+    
+    class Meta:
+        ordering = ['title']
+    
 class Order(models.Model):
     PAYMENT_STATUS_PENDING = 'P',
     PAYMENT_STATUS_COMPLETE = 'C',
