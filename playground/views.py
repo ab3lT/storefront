@@ -1,6 +1,8 @@
+
+from django.forms import DecimalField
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.db.models import Q, F
+from django.db.models import Q, F, ExpressionWrapper, DecimalField
 from store.models import OrderItem, Product
 # Create your views here.
 # request -> response
@@ -21,7 +23,10 @@ def hello(request):
     #limiting results
     # query_set = Product.objects.all()[:5]
     # query_set = Product.objects.values('id','title', 'collection__title')  ## return dic
-    query_set = Product.objects.filter(id__in   =OrderItem.objects.values('product_id').distinct() )
+    # query_set = Product.objects.filter(id__in   =OrderItem.objects.values('product_id').distinct() )
+    discounted_price = ExpressionWrapper(
+        F('unit_price') * 0.8, output_field=DecimalField())
+    query_set = Product.objects.annotate(discounted_price=discounted_price)
     # for product in query_set:
     #     print(product)
     return render(request, 'hello.html', {'name': 'abel', 'products': list(query_set)})
