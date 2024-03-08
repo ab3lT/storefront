@@ -3,6 +3,8 @@ from django.db.models.aggregates import Count
 from django.contrib import admin
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
+from django.utils.html import format_html, urlencode
+from django.urls import reverse
 from . import models
 
 @admin.register(models.Product)
@@ -30,10 +32,15 @@ class CustomerAdmin(admin.ModelAdmin):
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'product_count']
-    
     @admin.display(ordering='product_count')
     def product_count(self, collection):
-        return collection.product_count
+        url = (
+            reverse('admin:store_product_changelist')
+            + '?'
+            + urlencode({
+                'collection__id': str(collection.id)
+            }))
+        return format_html('<a href="{}">{} Products</a>', url, collection.product_count)
     
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
         return super().get_queryset(request).annotate(
