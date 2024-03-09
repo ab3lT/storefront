@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions', #for sessions we don't use that any more
     'django.contrib.messages',# displaying one time notification 
     'django.contrib.staticfiles', # for static files image , css , html
+    'rest_framework',
     'playground',
     'debug_toolbar',
     'store',
