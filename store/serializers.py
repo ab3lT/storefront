@@ -16,10 +16,10 @@ class ProductSerializer(serializers.ModelSerializer):
     # title = serializers.CharField(max_length = 255)
     price = serializers.DecimalField(max_digits=6, decimal_places=2, source = 'unit_price')
     price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
-    collection = serializers.HyperlinkedRelatedField(
-        queryset = Collection.objects.all(),
-        view_name = 'collection-detail'
-    )    
+    # collection = serializers.HyperlinkedRelatedField(
+    #     queryset = Collection.objects.all(),
+    #     view_name = 'collection-detail'
+    # )    
     
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(1.1)
@@ -35,3 +35,7 @@ class ProductSerializer(serializers.ModelSerializer):
     #     instance.save()
     #     return instance
     
+    #custom validation
+    # def validate(self, data):
+    #     if data['password'] != data['confirm_password']:
+    #         return serializers.ValidationError('Password do not match')
