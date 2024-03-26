@@ -73,8 +73,10 @@ class CustomerAdmin(admin.ModelAdmin):
         )
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
+    # autocomplete_fields = ['featured_product']
     search_fields = ['title']
     list_display = ['title', 'product_count']
+    
     @admin.display(ordering='product_count')
     def product_count(self, collection):
         url = (
@@ -87,7 +89,7 @@ class CollectionAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
         return super().get_queryset(request).annotate(
-                            product_count= Count('product')
+                            product_count= Count('products')
                             )
 
 @admin.register(models.Order)
