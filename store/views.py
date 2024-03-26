@@ -3,56 +3,15 @@ from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Product
-from .serializers import ProductSerializer
+from .models import Collection, Product
+from .serializers import CollectionSerializer, ProductSerializer
 from django.http import HttpResponse
 from django.http import JsonResponse
-from Arifpay_Plugin import ArifPay
-import requests
+from django.db.models.aggregates import Count
 
-arifpay= ArifPay("G8FbER8zZ9uco5tLuVnNKycJwXzvJTyo","2025-02-01T03:45:27")
-# Create your views here.
 
-paymentInfo= {
-    "cancelUrl": "https://example.com",
-    "errorUrl": "http://error.com",
-    "notifyUrl": "https://gateway.arifpay.net/test/callback",
-    "successUrl": "http://example.com",
-    "paymentMethods": [
-      "TELEBIRR"
-    ],
-    "expireDate": "2025-02-01T03:45:27",
-    "items": [
-        {
-            "name": "ሙዝ",
-            "quantity": 1,
-            "price": 100,
-            "description": "Fresh Corner preimuim Banana.",
-            "image": "https://4.imimg.com/data4/KK/KK/GLADMIN-/product-8789_bananas_golden-500x500.jpg"
-        },
-        {
-            "name": "ሙዝ",
-            "quantity": 1,
-            "price": 1,
-            "description": "Fresh Corner preimuim Banana.",
-            "image": "https://4.imimg.com/data4/KK/KK/GLADMIN-/product-8789_bananas_golden-500x500.jpg"
-        }
-    ],
-    "beneficiaries": [
-        {
-            "accountNumber": "01320811436100",
-            "bank": "Abet",
-            "amount": 2.0
-        }
-    ],
-    "lang": "EN"
-}
 
-@api_view(['GET'])
-def createcheckout(request):
-    if request.method=='GET':
-        response=arifpay.Make_payment(paymentInfo)
-        return JsonResponse(response)
+
     
 @api_view(['GET', 'POST'])
 def product_list(request):
@@ -82,6 +41,39 @@ def product_detail(request, id):
             return Response({'error': 'product cannot be deleted because it is associated with an order item '},status=status.HTTP_405_METHOD_NOT_ALLOWED)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-@api_view() 
-def collection_detail(request, pk):
+
+@api_view(['GET', 'POST'])
+def collection_list(request):
+    if request.method == 'GET':
+        queryset = Collection.objects.annotate(products_count=Count('products')).all()
+        serializer = CollectionSerializer(queryset, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = CollectionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['GET', 'PUT', 'DELETE']) 
+def collection_detail(request, id):
+    collection = get_object_or_404(
+        Collection.objects.annotate(
+        products_count = Count('products')), pk=id)
+    if request.method == 'GET':
+        serializer = CollectionSerializer(collection)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = CollectionSerializer(collection, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        if collection.products.count() > 0 :
+            return Response({'error': 'collection cannot be deleted because it includes one or more products '},status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        collection.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        
+
     return Response('ok')
+
+ 
